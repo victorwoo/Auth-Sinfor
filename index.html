@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Auth-firewall by victorwoo</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Auth-firewall</h1>
+        <p>自动通过（联迪/实达）防火墙认证的脚本</p>
+        <p class="view"><a href="https://github.com/victorwoo/Auth-Firewall">View the Project on GitHub <small>victorwoo/Auth-Firewall</small></a></p>
+        <ul>
+          <li><a href="https://github.com/victorwoo/Auth-Firewall/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/victorwoo/Auth-Firewall/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/victorwoo/Auth-Firewall">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="auth-firewall-10-2014-11-07" class="anchor" href="#auth-firewall-10-2014-11-07" aria-hidden="true"><span class="octicon octicon-link"></span></a>Auth-Firewall 1.0 (2014-11-07)</h1>
+
+<p>自动通过（联迪/实达）防火墙认证的脚本。
+适用于 PowerShell 3.0 及更高版本（Windows 7 / Windows 2008 及更高版本自带）。</p>
+
+<h2>
+<a id="参数设置" class="anchor" href="#%E5%8F%82%E6%95%B0%E8%AE%BE%E7%BD%AE" aria-hidden="true"><span class="octicon octicon-link"></span></a>参数设置</h2>
+
+<p>编辑 <code>Auth-Firewall.cmd</code>，将 <code>UserName</code> 和 <code>Password</code> 修改为实际的域用户名和密码。</p>
+
+<h2>
+<a id="手工认证" class="anchor" href="#%E6%89%8B%E5%B7%A5%E8%AE%A4%E8%AF%81" aria-hidden="true"><span class="octicon octicon-link"></span></a>手工认证</h2>
+
+<p>双击执行 <code>Auth-Firewall.cmd</code>。</p>
+
+<h2>
+<a id="自动认证" class="anchor" href="#%E8%87%AA%E5%8A%A8%E8%AE%A4%E8%AF%81" aria-hidden="true"><span class="octicon octicon-link"></span></a>自动认证</h2>
+
+<ul>
+<li>运行 <code>taskschd.msc</code>，点击“导入任务”，选择 <code>Auth-Firewall.xml</code>。</li>
+<li>将“常规/安全选项”中的账户改为实际值。</li>
+<li>编辑“操作”中的项目，将路径改为实际值。</li>
+</ul>
+
+<p>下次检测到网络连接时，将会自动执行认证脚本。</p>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/victorwoo">victorwoo</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
