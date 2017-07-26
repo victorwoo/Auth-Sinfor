@@ -1,5 +1,5 @@
-Auth-Firewall 1.0 (2017-07-26)
-==============================
+Auth-Sinfor 1.0 (2017-07-26)
+============================
 自动通过 Sinfor（上网认证系统）认证的脚本。
 
 适用于 PowerShell 3.0 及更高版本（Windows 7 / Windows 2008 及更高版本自带）。
@@ -8,11 +8,11 @@ Auth-Firewall 1.0 (2017-07-26)
 
 手工认证
 --------
-双击执行 `Auth-Firewall.cmd`。
+双击执行 `Auth-Sinfor.cmd`。
 
 自动认证
 --------
-- 运行 `taskschd.msc`，点击“导入任务”，选择 `Auth-Firewall.xml`。
+- 运行 `taskschd.msc`，点击“导入任务”，选择 `Auth-Sinfor.xml`。
 - 将“常规/安全选项”中的账户改为实际值。
 - 编辑“操作”中的项目，将路径改为实际值。
 
