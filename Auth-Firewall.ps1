@@ -1,16 +1,26 @@
-﻿[CmdletBinding(DefaultParameterSetName = 'URI',
+﻿# requires -version 3
+
+[CmdletBinding(DefaultParameterSetName = 'URI',
 			   SupportsShouldProcess = $true,
 			   ConfirmImpact = 'Medium')]
 Param(
     [string]
-    $BaseUrl = 'http://172.20.6.254/',
+    $BaseUrl = 'http://1.1.1.2',
     
-    [string]
-    $UserName = 'wub',
-    
-    [string]
-    $Password = 'YOUR-PASSWORD-HERE'
+    [bool]
+    $ForceLogout = $true
 )
+
+function Convert-Encoding([string]$iso5589_1Str) {
+    $utf8 = [System.Text.Encoding]::GetEncoding(65001) 
+    $iso88591 = [System.Text.Encoding]::GetEncoding(28591) #ISO 8859-1 ,Latin-1
+
+    $wrong_bytes = $utf8.GetBytes($iso5589_1Str)
+
+    $right_bytes = [System.Text.Encoding]::Convert($utf8,$iso88591,$wrong_bytes) #仔细看这里 
+    $right_string = $utf8.GetString($right_bytes)  #仔细看这里
+    return $right_string
+}
 
 function ConvertFrom-UnixTime {
   param(
@@ -40,70 +50,98 @@ function Get-JSTime
 function Process-Logout
 {
     $logoutUrl = $BaseUrl + '/ajaxlogout?_t=' + (Get-JSTime)
+    # http://1.1.1.2/ajaxlogout?_t=1501033712947
     Write-Debug $logoutUrl
-    $content = Invoke-RestMethod $logoutUrl
-    Write-Debug "注销请求返回内容：$content"
+    $response = Invoke-RestMethod $logoutUrl -Proxy $null -DisableKeepAlive
+    $msg = Convert-Encoding $response.msg
+    Write-Debug "注销请求返回内容：$msg"
     return $content.success
 }
 
 # 登录
 function Process-Login
 {
-    #$loginUrl = $BaseUrl + 'webAuth/'
-    $loginUrl = $BaseUrl + 'webAuth/index.htm?www.baidu.com/'
-    Write-Debug $loginUrl
-    $response = Invoke-WebRequest $loginUrl -SessionVariable $rb
-    $form = $response.Forms[0]
-    $form.Fields["username"] = $UserName
-    $form.Fields["password"] = $Password
-    $form.Fields["pwd"] = $Password
-    $form.Fields["secret"] = 'true'
-
-    $response = Invoke-WebRequest $loginUrl -Method Post -Body $form -WebSession $rb
-    if ($response.Content -is [string])
-    {
-        $content = $response.Content
-    } elseif ($response.Content -is [byte[]])
-    {
-        $content = [System.Text.Encoding]::UTF8.GetString($response.Content)
+    if (Test-Path 'credential.xml') {
+        $credential = Import-Clixml -Path "credential.xml"
+    } else {
+        $credential = Get-Credential
+        $credential | Export-Clixml -Path "credential.xml"
     }
- 
-    Write-Debug "登录请求返回内容：$content"
-    if ($content.Contains('上网认证系统')) { return $false }
-    return $true
+    #$loginUrl = $BaseUrl + '/webAuth/'
+    $portal = "$BaseUrl/ac_portal/default/pc.html?template=default&tabs=pwd&vlanid=0&url=http://news.baidu.com/"
+    Write-Debug $portal
+    $response = Invoke-WebRequest $portal -SessionVariable 'session' -Proxy $null -DisableKeepAlive
+
+    # opr=pwdLogin&userName=wub&pwd=asdfasdf.04&rememberPwd=0
+    $body = @{
+        opr = 'pwdLogin';
+        userName = $credential.UserName;
+        pwd = $credential.GetNetworkCredential().Password;
+        rememberPwd = 0
+    }
+    $loginUrl = "$BaseUrl/ac_portal/login.php"
+    $response = Invoke-RestMethod $loginUrl `
+        -Method Post `
+        -Body $body `
+        -ContentType 'application/x-www-form-urlencoded;charset=utf-8' `
+        -SessionVariable 'session' `
+        -Proxy $null `
+        -DisableKeepAlive
+    $msg = Convert-Encoding $response.msg
+    Write-Debug "登录请求返回内容：$msg"
+
+    return $response.success -or $msg -eq '用户已在线，不需要再次认证'
 }
 
 function Get-LoginStatus
 {
-    $response = Invoke-WebRequest www.baidu.com -DisableKeepAlive
-    return ($response.Content.Contains('百度'))
+    $response = Invoke-WebRequest news.baidu.com -UseBasicParsing -Proxy $null -DisableKeepAlive
+    Write-Debug $response
+    return -not $response.Content.Contains($BaseUrl)
 }
 
 
 #$DebugPreference="Continue"
 $DebugPreference="SilentlyContinue"
+
 $logName = 'Application'
 $source = 'AuthFirewall'
-
 $time = Get-Date
+echo --------- >> log.txt
 echo $time >> log.txt
 
-#return
 $log = '检测登录状态'
 Write-Output $log
 echo $log >> log.txt
+$needLogin = $false
 
 if (Get-LoginStatus)
 {
     $log = '已登录'
     Write-Output $log
     echo $log >> log.txt
+
+    if (!$ForceLogout) {
+        return
+    }
+    
+    $log = '重新登录'
+    Write-Output $log
+    echo $log >> log.txt
+    Process-Logout | Out-Null
+    $needLogin = $true
+} else {
+    $needLogin = $true
+}
+
+if (!$needLogin) {
     return
 }
 
-$log = '未登录，尝试登录'
+$log = '尝试登录'
 Write-Output $log
 echo $log >> log.txt
+
 if (Process-Login)
 {
     $log = '登录成功'

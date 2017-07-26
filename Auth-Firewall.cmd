@@ -1,7 +1,5 @@
 @ECHO OFF
 
-SET BaseUrl=http://172.20.6.254/
-SET UserName=wub
-SET Password=YOUR_PASSWORD_HERE
+SET BaseUrl=http://1.1.1.2/
 
-powershell -NoProfile -ExecutionPolicy Unrestricted .\%~n0.ps1 -BaseUrl %BaseUrl% -UserName %UserName% -Password %Password%
+powershell -NoProfile -ExecutionPolicy Unrestricted .\%~n0.ps1 -BaseUrl %BaseUrl%
