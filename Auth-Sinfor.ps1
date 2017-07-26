@@ -67,7 +67,6 @@ function Process-Login
         $credential = Get-Credential
         $credential | Export-Clixml -Path "credential.xml"
     }
-    #$loginUrl = $BaseUrl + '/webAuth/'
     $portal = "$BaseUrl/ac_portal/default/pc.html?template=default&tabs=pwd&vlanid=0&url=http://news.baidu.com/"
     Write-Debug $portal
     $response = Invoke-WebRequest $portal -SessionVariable 'session' -Proxy $null -DisableKeepAlive
