@@ -149,6 +149,8 @@ if (Process-Login)
     return
 }
 
+Remove-Item credential.xml
+
 $log = '尝试登录失败，尝试注销'
 Write-Warning $log
 echo $log >> log.txt
